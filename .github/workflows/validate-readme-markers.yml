@@ -17,3 +17,4 @@ jobs:
         with:
           COMMIT_MSG: 'chore: auto-update README activity log [skip ci]'
           MAX_LINES: 5
+          TARGET_FILE: 'README.md'
