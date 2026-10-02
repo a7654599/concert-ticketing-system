@@ -1,4 +1,4 @@
-name: Update README Activity
+name: Validate README Markers
 on:
   schedule:
     - cron: '0 * * * *'
