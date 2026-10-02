@@ -4,8 +4,6 @@ on:
   schedule:
     - cron: '0 * * * *' # 每小時自動執行一次
   workflow_dispatch: # 支援在 Actions 頁面手動觸發
-  push:
-    branches: [ main ]
 
 jobs:
   build:
