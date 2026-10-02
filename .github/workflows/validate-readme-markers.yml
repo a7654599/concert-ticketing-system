@@ -1,0 +1,22 @@
+name: Update README Activity
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update Activity Section
+        uses: jamesgeorge007/github-activity-readme@v0.4.3
+        env:
+          GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
+        with:
+          COMMIT_MSG: 'chore: auto-update README activity log [skip ci]'
+          MAX_LINES: 5
