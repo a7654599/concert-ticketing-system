@@ -67,7 +67,7 @@ deploy-staging:
           NOTE: "Testing pre-production release"
         run: |
           gh release create "$TAG" build.zip --notes "$NOTE"
-  deploy-production:
+deploy-production:
     needs: deploy-staging
     runs-on: ubuntu-latest
     environment: production   # 這裡會自動套用 Step 1 設定的 Required reviewers！
