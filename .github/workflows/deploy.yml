@@ -47,6 +47,7 @@ jobs:
             gh release upload "$TAG" build.zip --clobber
           else
             gh release create "$TAG" build.zip --notes "$NOTE"
+          fi
   deploy-staging:
     needs: deploy-dev
     runs-on: ubuntu-latest
