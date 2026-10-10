@@ -67,7 +67,6 @@ deploy-staging:
           NOTE: "Testing pre-production release"
         run: |
           gh release create "$TAG" build.zip --notes "$NOTE"
-
   deploy-production:
     needs: deploy-staging
     runs-on: ubuntu-latest
