@@ -42,8 +42,12 @@ jobs:
           TAG: dev-${{ github.sha }}-${{ github.run_number }}
           NOTE: "Development Build Release (${{ github.sha }}) - Internal testing."
         run: |
-          gh release create "$TAG" build.zip --notes "$NOTE"
-
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists; updating artifact"
+            gh release upload "$TAG" build.zip --clobber
+          else
+            gh release create "$TAG" build.zip --notes "$NOTE"
+          fi
   deploy-staging:
     needs: deploy-dev
     runs-on: ubuntu-latest
