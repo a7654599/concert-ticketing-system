@@ -66,6 +66,13 @@ jobs:
         run: |
           echo "Running automated tests..."
           npm test || (echo "❌ Tests failed, halting pipeline" && exit 1)
+      - name: Create GitHub Issue on Failure
+        if: failure()
+        run: |
+          gh issue create --title "🚨 Pipeline Test Failed" --body "Automated tests failed on commit ${{ github.sha }}. Please check workflow logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
   deploy-staging:
     needs: test
     runs-on: ubuntu-latest
