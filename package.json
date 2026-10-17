@@ -1,3 +1,7 @@
-"scripts": {
-  "test": "node test/mock.test.js"
+{
+  "name": "concert-ticketing-system",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "node test/mock.test.js"
+  }
 }
