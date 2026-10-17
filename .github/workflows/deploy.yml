@@ -48,9 +48,11 @@ jobs:
           else
             gh release create "$TAG" build.zip --notes "$NOTE"
           fi
-  test:
-    needs: build             # 必須等 build 完成後才開始
+  test-unit:
+    needs: build
     runs-on: ubuntu-latest
+    env:
+      TEST_ENV: staging
     permissions:
       contents: read
       issues: write
@@ -65,19 +67,50 @@ jobs:
         with:
           name: build-artifact
           path: dist/
-      - name: Run Automated Tests
+      - name: Run Unit Tests
         run: |
-          echo "Running automated tests..."
-          npm test || (echo "❌ Tests failed, halting pipeline" && exit 1)
+          echo "Running Unit Tests in environment: ${TEST_ENV}"
+          npm test || (echo "❌ Unit Tests failed, halting pipeline" && exit 1)
       - name: Create GitHub Issue on Failure
         if: failure()
         run: |
-          gh issue create --title "🚨 Pipeline Test Failed" --body "Automated tests failed on commit ${{ github.sha }}. Please check workflow logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          gh issue create --title "🚨 Unit Test Failed" --body "Unit tests failed on commit ${{ github.sha }}. Please check workflow logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+
+  test-integration:
+    needs: test-unit
+    runs-on: ubuntu-latest
+    env:
+      TEST_ENV: staging
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - run: npm install
+      - uses: actions/download-artifact@v4
+        with:
+          name: build-artifact
+          path: dist/
+      - name: Run Integration Tests
+        run: |
+          echo "Running Integration Tests in environment: ${TEST_ENV}"
+          npm test || (echo "❌ Integration Tests failed, halting pipeline" && exit 1)
+      - name: Create GitHub Issue on Failure
+        if: failure()
+        run: |
+          gh issue create --title "🚨 Integration Test Failed" --body "Integration tests failed on commit ${{ github.sha }}. Please check workflow logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
   deploy-staging:
-    needs: test
+    needs: test-integration
     runs-on: ubuntu-latest
     environment: staging
     permissions:
@@ -99,14 +132,14 @@ jobs:
     runs-on: ubuntu-latest
     environment: staging
     permissions:
-      contents: read  # 嚴格遵守最小權限原則：僅讀取
+      contents: read  
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Run Guarded AI Review Agent
         env:
-          AI_API_KEY: ${{ secrets.AI_API_KEY }}  # 從環境祕密讀取，不寫死
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}  
         run: |
           echo "AI Agent is analyzing changes..."
           echo "## AI Pre-Deployment Risk Assessment Report" > ai-report.md
