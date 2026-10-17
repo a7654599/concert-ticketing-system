@@ -48,8 +48,26 @@ jobs:
           else
             gh release create "$TAG" build.zip --notes "$NOTE"
           fi
+  test:
+    needs: build             # 必須等 build 完成後才開始
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - run: npm install
+      - uses: actions/download-artifact@v4
+        with:
+          name: build-artifact
+          path: dist/
+      - name: Run Automated Tests
+        run: |
+          echo "Running automated tests..."
+          npm test || (echo "❌ Tests failed, halting pipeline" && exit 1)
   deploy-staging:
-    needs: deploy-dev
+    needs: test
     runs-on: ubuntu-latest
     environment: staging
     permissions:
