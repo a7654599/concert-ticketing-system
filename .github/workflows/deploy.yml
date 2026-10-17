@@ -51,6 +51,9 @@ jobs:
   test:
     needs: build             # 必須等 build 完成後才開始
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
     steps:
       - uses: actions/checkout@v4
       - name: Set up Node.js
