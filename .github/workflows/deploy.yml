@@ -24,7 +24,7 @@ jobs:
           path: build.zip
 
   deploy-dev:
-    needs: build
+    needs: test-integration
     runs-on: ubuntu-latest
     environment: dev
     permissions:
@@ -123,7 +123,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
-          TAG: staging-${{ github.sha }}
+          TAG: staging-${{ github.sha }}-${{ github.run_number }}
           NOTE: "Staging Release Candidate (${{ github.sha }}) - Prepared for automated AI review and pre-production testing."
         run: |
           gh release create "$TAG" build.zip --notes "$NOTE"
@@ -167,7 +167,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
-          TAG: prod-${{ github.sha }}
+          TAG: prod-${{ github.sha }}-${{ github.run_number }}
           NOTE: "Production Release (${{ github.sha }}) - Approved by reviewer after passing AI risk assessment."
         run: |
           gh release create "$TAG" build.zip --notes "$NOTE"
