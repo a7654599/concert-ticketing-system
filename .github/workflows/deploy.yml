@@ -24,7 +24,7 @@ jobs:
           path: build.zip
 
   deploy-dev:
-    needs: build
+    needs: test-integration
     runs-on: ubuntu-latest
     environment: dev
     permissions:
