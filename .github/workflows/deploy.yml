@@ -51,6 +51,9 @@ jobs:
   test-unit:
     needs: build
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18, 20]
     env:
       TEST_ENV: staging
     permissions:
@@ -58,10 +61,10 @@ jobs:
       issues: write
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Node.js
+      - name: Set up Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: ${{ matrix.node-version }}
       - run: npm install
       - uses: actions/download-artifact@v4
         with:
@@ -69,12 +72,12 @@ jobs:
           path: dist/
       - name: Run Unit Tests
         run: |
-          echo "Running Unit Tests in environment: ${TEST_ENV}"
-          npm test || (echo "❌ Unit Tests failed, halting pipeline" && exit 1)
+          echo "Running Unit Tests on Node ${{ matrix.node-version }} in environment: ${TEST_ENV}"
+          npm run test:unit || (echo "❌ Unit Tests failed, halting pipeline" && exit 1)
       - name: Create GitHub Issue on Failure
         if: failure()
         run: |
-          gh issue create --title "🚨 Unit Test Failed" --body "Unit tests failed on commit ${{ github.sha }}. Please check workflow logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          gh issue create --title "🚨 Unit Test Failed (Node ${{ matrix.node-version }})" --body "Unit tests failed on commit ${{ github.sha }}. Logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
@@ -101,7 +104,7 @@ jobs:
       - name: Run Integration Tests
         run: |
           echo "Running Integration Tests in environment: ${TEST_ENV}"
-          npm test || (echo "❌ Integration Tests failed, halting pipeline" && exit 1)
+          npm run test:integration || (echo "❌ Integration Tests failed, halting pipeline" && exit 1)
       - name: Create GitHub Issue on Failure
         if: failure()
         run: |
