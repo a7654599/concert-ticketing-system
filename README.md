@@ -1,5 +1,5 @@
 ## ⚡ Recent Repository Activity
 
 <!--START_SECTION:activity-->
-[![Deployment Pipeline](https://github.com/a7654599/concert-ticketing-system/actions/workflows/deploy.yml/badge.svg)](https://github.com/a7654599/concert-ticketing-system/actions/workflows/deploy.yml)
+1. ❌ Merged PR [#28](undefined) in [a7654599/concert-ticketing-system](https://github.com/a7654599/concert-ticketing-system)
 <!--END_SECTION:activity-->
